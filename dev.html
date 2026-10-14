@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Deep Schema</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Barlow:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<link rel="stylesheet" href="styles.css">
+<script>
+/* Startup check: if anything stops the game from loading, show the reason on the title screen instead of a blank page. */
+(function () {
+  function fail(msg) {
+    if (window.__dsFailed) return;   // keep the first problem; later errors are usually knock-on effects
+    var e = document.getElementById("splashErr"), b = document.getElementById("startBtn");
+    window.__dsFailed = true;
+    if (!e) { window.__dsEarlyError = msg; return; }
+    e.hidden = false; e.textContent = msg;
+    if (b) { b.disabled = true; b.textContent = "Couldn't start"; }
+  }
+  window.__dsFail = fail;
+  var noEngine = "The game engine (Phaser) didn't download. Check your internet connection, or turn off an ad or script blocker for this page, then reload.";
+  window.addEventListener("error", function (ev) {
+    var t = ev.target;
+    if (t && t !== window && t.tagName) { if (t.tagName === "SCRIPT") fail(noEngine); return; }  // a file failed to load; fonts and images don't matter
+    if (typeof Phaser === "undefined") return fail(noEngine);
+    fail("Error: " + (ev.message || "unknown") + (ev.lineno ? " (line " + ev.lineno + ")" : ""));
+  }, true);
+  window.addEventListener("unhandledrejection", function (ev) { fail("Error: " + (ev.reason && ev.reason.message || ev.reason)); });
+  setTimeout(function () { if (!window.__dsReady) fail(typeof Phaser === "undefined" ? noEngine : "Still loading after 15 seconds. If this keeps happening, take a screenshot of this screen and send it over."); }, 15000);
+})();
+</script>
+</head>
+<body>
+<div class="splash" id="splash">
+  <div class="splash-in">
+    <div class="kicker">ITSC 3160 study game</div>
+    <h1>Deep Schema</h1>
+    <p class="muted">Dive the depth zones, answer questions to survive, and defend your seabase from creatures of bad database design.</p>
+    <button class="btn splash-btn" id="startBtn" disabled>Loading…</button>
+    <p class="splash-err" id="splashErr" hidden></p>
+    <p class="splash-ver">Version 2026.10.14b · Bloom levels, focus mode, typed answers</p>
+  </div>
+</div>
+<div id="game" aria-label="Deep Schema game"></div>
+<div class="focusdim" id="dim" hidden></div>
+<header class="hud">
+  <div class="loc"><div class="zone" id="hZone">Seabase</div><div class="depth" id="hDepth">12 m</div></div>
+  <div class="o2" id="hO2" hidden><div class="lbl"><span>O₂</span><span id="hO2v">100</span></div><div class="bar"><div class="fill" id="hO2f" style="width:100%"></div></div></div>
+  <div class="cash"><div class="amt" id="hCash">0</div><div class="sub" id="hCashSub">Salvage</div></div>
+</header>
+<section class="sheet" id="sheet" aria-live="polite"></section>
+<div class="stick" id="stick" hidden><div class="knob" id="stickKnob"></div></div>
+<button class="actbtn" id="act" hidden>Scan</button>
+<button class="sonarbtn" id="sonarBtn" hidden>Sonar</button>
+<div class="toast" id="toast" style="opacity:0"></div>
+<aside class="coach" id="coach" hidden aria-live="polite"></aside>
+<!-- Phaser (game engine), then the game itself as ES modules. -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/phaser/3.80.1/phaser.min.js"></script>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>
